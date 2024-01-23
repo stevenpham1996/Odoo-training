@@ -46,7 +46,7 @@ sudo apt install postgresql postgresql-contrib
 
 # install pip & python dependencies
 sudo apt-get install build-essential
-sudo apt-get install libsasl2-dev python3.11-dev libldap2-dev libssl-dev libpq-dev
+sudo apt-get install libsasl2-dev python3.11-dev libldap2-dev libssl-dev libpq-dev libffi-dev
 python -m pip install --upgrade setuptools
 python -m pip install -r odoo/requirements.txt
 # python debugger
