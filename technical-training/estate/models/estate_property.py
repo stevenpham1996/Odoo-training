@@ -1,9 +1,15 @@
 from odoo import models, fields
+from dateutil.relativedelta import relativedelta
 
 
 class EstateProperty(models.Model):
     _name = "estate_property"
     _description = "Real Estate Property"
+
+    # --------------------------------------- Default Methods ----------------------------------
+
+    def _default_date_availability(self):
+        return (fields.Date.today() + relativedelta(months=3)).strftime("%d/%m/%Y")
 
     # --------------------------------------- Fields Declaration ----------------------------------
 
@@ -31,4 +37,15 @@ class EstateProperty(models.Model):
             ("W", "West"),
         ],
         string="Garden Orientation",
+    )
+    active = fields.Boolean("Active", default=True)
+    state = fields.Selection(
+        selection=[
+            ("new", "New"),
+            ("offer_received", "Offer Received"),
+            ("offer_accepted", "Offer Accepted"),
+            ("sold", "Sold"),
+            ("canceled", "Canceled"),
+        ],
+        default="new",
     )
