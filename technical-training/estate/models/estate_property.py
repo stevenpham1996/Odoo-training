@@ -3,13 +3,13 @@ from dateutil.relativedelta import relativedelta
 
 
 class EstateProperty(models.Model):
-    _name = "estate_property"
+    _name = "estate.property"
     _description = "Real Estate Property"
 
     # --------------------------------------- Default Methods ----------------------------------
 
     def _default_date_availability(self):
-        return (fields.Date.today() + relativedelta(months=3)).strftime("%d/%m/%Y")
+        return (fields.Date.today() + relativedelta(months=3)).strftime("%Y-%m-%d")
 
     # --------------------------------------- Fields Declaration ----------------------------------
 
@@ -47,5 +47,8 @@ class EstateProperty(models.Model):
             ("sold", "Sold"),
             ("canceled", "Canceled"),
         ],
+        string="Status",
+        required=True,
+        copy=False,
         default="new",
     )
