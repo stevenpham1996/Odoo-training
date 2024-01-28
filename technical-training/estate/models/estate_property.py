@@ -52,3 +52,8 @@ class EstateProperty(models.Model):
         copy=False,
         default="new",
     )
+
+    # --------------------------------------- Relational Fields ----------------------------------
+    property_type_id = fields.Many2one(
+        "estate.type", string="Property Type", ondelete="set null", index=True
+    )
