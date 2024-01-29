@@ -54,6 +54,18 @@ class EstateProperty(models.Model):
     )
 
     # --------------------------------------- Relational Fields ----------------------------------
-    property_type_id = fields.Many2one(
+    type_id = fields.Many2one(
         "estate.type", string="Property Type", ondelete="set null", index=True
     )
+    buyer_id = fields.Many2one(
+        "res.partner", string="Buyer", ondelete="set null", default="Odoo"
+    )
+    salesman_id = fields.Many2one(
+        "res.users",
+        string="Salesman",
+        copy=False,
+        ondelete="set null",
+        index=True,
+        default=lambda self: self.env.user,
+    )
+    tag_ids = fields.Many2many("estate.tag", string="Tags", index=True)
