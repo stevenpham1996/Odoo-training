@@ -8,3 +8,5 @@ class EstateTag(models.Model):
     # --------------------------------------- Fields Declaration ----------------------------------
 
     name = fields.Char("Name", required=True)
+    
+    
