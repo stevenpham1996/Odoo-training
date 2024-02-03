@@ -1,4 +1,5 @@
 from odoo import models, fields, api
+from odoo.exceptions import UserError
 from dateutil.relativedelta import relativedelta
 
 
@@ -52,6 +53,12 @@ class EstateProperty(models.Model):
         copy=False,
         default="new",
     )
+    
+    # SQL constraints
+    _sql_constraints = [
+        ("check_expected_price", "CHECK(expected_price > 0)", "The expected price must be greater than 0"),
+        ("check_selling_price", "CHECK(selling_price > 0)", "The selling price must be greater than 0"),
+    ]
 
     # --------------------------------------- Relational Fields ----------------------------------
     type_id = fields.Many2one(
@@ -100,3 +107,21 @@ class EstateProperty(models.Model):
         else:
             self.garden_area = 0
             self.garden_orientation = False
+
+    # --------------------------------------- Action Methods ----------------------------------
+
+    def action_sold(self):
+        for record in self:
+            if record.state == "canceled":
+                raise UserError(
+                    "A canceled property can not be sold."
+                )
+            return record.write({"state": "sold"})
+
+    def action_cancel(self):
+        for record in self:
+            if record.state == "sold":
+                raise UserError(
+                    "A sold property can not be canceled."
+                )
+            return record.write({"state": "canceled"})
