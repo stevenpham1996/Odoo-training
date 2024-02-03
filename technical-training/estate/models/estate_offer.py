@@ -28,7 +28,10 @@ class EstateOffer(models.Model):
         inverse="_inverse_deadline_date",
         string="Deadline (days)",
     )
-
+    # SQL constraints
+    _sql_constraints = [
+        ("check_offer_price", "CHECK(price > 0)", "The offer price must be greater than 0"),
+    ]
     # --------------------------------------- Compute Methods ----------------------------------
 
     @api.depends("create_date", "validity")

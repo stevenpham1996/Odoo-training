@@ -12,15 +12,10 @@ class EstateType(models.Model):
     # --------------------------------------- Fields Declaration ----------------------------------
 
     name = fields.Char("Name", required=True)
-    # type = fields.Char("Property Type", required=True)
-    # postcode = fields.Char("Postcode")
-    # date_availability = fields.Date(
-    #     "Available From",
-    #     default=lambda self: self._default_date_availability(),
-    #     copy=False,
-    # )
-    # expected_price = fields.Float("Expected Price", required=True)
-    # selling_price = fields.Float("Selling Price", copy=False, readonly=True)
-
+    # SQL constraints
+    _sql_constraints = [
+        ("check_name", "UNIQUE(name)", "The tag name must be unique"),
+    ]
+    
     # --------------------------------------- Relational Fields ----------------------------------
     # partner

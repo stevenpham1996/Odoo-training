@@ -1,5 +1,6 @@
 from odoo import models, fields, api
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
+from odoo.tools.float_utils import float_is_zero, float_compare
 from dateutil.relativedelta import relativedelta
 
 
@@ -53,11 +54,19 @@ class EstateProperty(models.Model):
         copy=False,
         default="new",
     )
-    
+
     # SQL constraints
     _sql_constraints = [
-        ("check_expected_price", "CHECK(expected_price > 0)", "The expected price must be greater than 0"),
-        ("check_selling_price", "CHECK(selling_price > 0)", "The selling price must be greater than 0"),
+        (
+            "check_expected_price",
+            "CHECK(expected_price > 0)",
+            "The expected price must be greater than 0",
+        ),
+        (
+            "check_selling_price",
+            "CHECK(selling_price > 0)",
+            "The selling price must be greater than 0",
+        ),
     ]
 
     # --------------------------------------- Relational Fields ----------------------------------
@@ -113,15 +122,31 @@ class EstateProperty(models.Model):
     def action_sold(self):
         for record in self:
             if record.state == "canceled":
-                raise UserError(
-                    "A canceled property can not be sold."
-                )
+                raise UserError("A canceled property can not be sold.")
             return record.write({"state": "sold"})
 
     def action_cancel(self):
         for record in self:
             if record.state == "sold":
-                raise UserError(
-                    "A sold property can not be canceled."
-                )
+                raise UserError("A sold property can not be canceled.")
             return record.write({"state": "canceled"})
+
+
+# ----------------------------------------- constraint methods ----------------------------------
+
+
+@api.constrains("expected_price", "selling_price")
+def _check_selling_price(self):
+    for record in self:
+        if (
+            not float_is_zero(record.selling_price, precision_rounding=0.01)
+            and float_compare(
+                record.selling_price,
+                record.expected_price * 90.0 / 100.0,
+                precision_rounding=0.01,
+            )
+            < 0
+        ):
+            raise ValidationError(
+                "The selling price must be greater than the expected price."
+            )
