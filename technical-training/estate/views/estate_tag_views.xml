@@ -5,7 +5,7 @@
         <field name="name">estate.tag.tree</field>
         <field name="model">estate.tag</field>
         <field name="arch" type="xml">
-            <tree string="Tags">
+            <tree string="Tags" editable="bottom">
                 <field name="name"/>
             </tree>
         </field>

@@ -9,6 +9,8 @@ class EstateTag(models.Model):
     # --------------------------------------- Fields Declaration ----------------------------------
 
     name = fields.Char("Name", required=True)
+    color = fields.Integer("Color Index")
+    _order = "name desc"
 
     # SQL constraints
     _sql_constraints = [

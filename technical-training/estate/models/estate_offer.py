@@ -6,6 +6,7 @@ from dateutil.relativedelta import relativedelta
 class EstateOffer(models.Model):
     _name = "estate.offer"
     _description = "Property Offers"
+    _order = "price desc"
 
     # --------------------------------------- Fields Declaration ----------------------------------
 
@@ -22,6 +23,8 @@ class EstateOffer(models.Model):
     )
     partner_id = fields.Many2one("res.partner", string="Partner", required=True)
     property_id = fields.Many2one("estate.property", string="Property", required=True)
+    # Related Fields
+    type_id = fields.Char("Type", related="property_id.type_id.name", store=True)
     # Computed Fields
     date_deadline = fields.Date(
         compute="_compute_deadline_date",
@@ -30,8 +33,13 @@ class EstateOffer(models.Model):
     )
     # SQL constraints
     _sql_constraints = [
-        ("check_offer_price", "CHECK(price > 0)", "The offer price must be greater than 0"),
+        (
+            "check_offer_price",
+            "CHECK(price > 0)",
+            "The offer price must be greater than 0",
+        ),
     ]
+
     # --------------------------------------- Compute Methods ----------------------------------
 
     @api.depends("create_date", "validity")
@@ -54,7 +62,7 @@ class EstateOffer(models.Model):
     def action_accept(self):
         if "accepted" in self.mapped("property_id.state"):
             raise UserError("The property is already sold")
-        self.write( #NOTE: write() only usable for fields within the model 
+        self.write(  # NOTE: write() only usable for fields within the developing model
             {"status": "accepted"}
         )
         return self.mapped("property_id").write(
@@ -62,13 +70,12 @@ class EstateOffer(models.Model):
                 "state": "offer_accepted",
                 "selling_price": self.price,
                 "buyer_id": self.partner_id,
-                }
+            }
         )
-    
+
     def action_refuse(self):
         for offer in self:
             if offer.status != "refused":
                 offer.status = "refused"
                 offer.property_id.selling_price = 0.0
                 offer.property_id.buyer_id = False
-                
