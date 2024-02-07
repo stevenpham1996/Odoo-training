@@ -135,19 +135,28 @@ class EstateProperty(models.Model):
 
 # ----------------------------------------- constraint methods ----------------------------------
 
+    @api.constrains("expected_price", "selling_price")
+    def _check_selling_price(self):
+        for record in self:
+            if (
+                not float_is_zero(record.selling_price, precision_rounding=0.01)
+                and float_compare(
+                    record.selling_price,
+                    record.expected_price * 90.0 / 100.0,
+                    precision_rounding=0.01,
+                )
+                < 0
+            ):
+                raise ValidationError(
+                    "The selling price must be greater than the expected price."
+                )
 
-@api.constrains("expected_price", "selling_price")
-def _check_selling_price(self):
-    for record in self:
-        if (
-            not float_is_zero(record.selling_price, precision_rounding=0.01)
-            and float_compare(
-                record.selling_price,
-                record.expected_price * 90.0 / 100.0,
-                precision_rounding=0.01,
-            )
-            < 0
-        ):
-            raise ValidationError(
-                "The selling price must be greater than the expected price."
-            )
+# ---------------------------------------- Inherited CRUD methods ----------------------------------
+
+    def unlink(self):
+        for record in self:
+            if record.state in ("new", "canceled"):
+                raise UserError("A sold or canceled property can not be deleted.")
+            else:
+                return super().unlink()
+                

@@ -1,5 +1,6 @@
 from odoo import fields, models, api
 from odoo.exceptions import UserError
+from odoo.tools.float_utils import float_is_zero, float_compare
 from dateutil.relativedelta import relativedelta
 
 
@@ -79,3 +80,17 @@ class EstateOffer(models.Model):
                 offer.status = "refused"
                 offer.property_id.selling_price = 0.0
                 offer.property_id.buyer_id = False
+
+
+# --------------------------------------- Inherited CRUD Methods ----------------------------------
+
+    @api.model
+    def create(self, offer):
+        if offer.get("property_id") and offer.get("price"):
+            prop = self.env["estate.property"].browse(offer["property_id"])
+            if prop.offer_ids:
+                max_offer = max(prop.mapped("offer_ids.price"))
+                if float_compare(offer["price"], max_offer, precision_rounding=0.01) <= 0:
+                    raise UserError("The offer must be higher than %.2f" % max_offer)
+            prop.state = "offer_received"
+        return super().create(offer)
