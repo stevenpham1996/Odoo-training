@@ -47,8 +47,8 @@
         <field name="arch" type="xml">
             <form string="Properties">
                 <header>
-                    <button name="action_sold" string="Sold" type="object" invisible="state == 'offer_accepted'"/>
-                    <button name="action_cancel" string="Cancel" type="object" invisible="state == 'offer_accepted'"/>
+                    <button name="action_sold" string="Sold" type="object" invisible="state not in ('new','offer_received','offer_accepted')"/>
+                    <button name="action_cancel" string="Cancel" type="object" invisible="state not in ('new','offer_received','offer_accepted')"/>
                     <field name="state" widget="statusbar" invisible="state == 'canceled'"/>
                 </header>
                 <sheet>

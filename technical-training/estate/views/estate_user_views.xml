@@ -2,7 +2,7 @@
 <odoo>
 
     <record id="inherited_estate_users_view_from" model="ir.ui.view">
-        <field name="name">estate.users</field>
+        <field name="name">Estate Salesman</field>
         <field name="model">res.users</field>
         <field name="inherit_id" ref="base.view_users_form"/>
         <field name="arch" type="xml">
